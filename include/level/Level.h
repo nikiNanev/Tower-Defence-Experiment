@@ -5,8 +5,10 @@
 
 class Level {
 public:
+    Level() = default;
     Level(int numEnemies, float spawnInterval);
     ~Level();
+
     void update();
     void render();
     bool isFinished() const;

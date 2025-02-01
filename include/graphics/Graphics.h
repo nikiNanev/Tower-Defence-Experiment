@@ -2,9 +2,9 @@
 #define GRAPHICS_H
 
 #include <vector>
-#include "Tower.h"
-#include "Enemy.h"
-#include "Color.h"
+#include "../tower/Tower.h"
+#include "../enemy/Enemy.h"
+#include "../utils/Color.h"
 
 class Graphics {
 public:
@@ -21,7 +21,7 @@ public:
 
     bool init();
     void cleanup();
-    void render(const std::vector<Tower>& towers, const std::vector<Enemy>& enemies);
+    void render();
 
     void drawCircle(int x, int y, int radius, const Color& color);
 

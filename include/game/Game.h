@@ -1,14 +1,19 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <vector>
+#pragma once
+
 #include "Graphics.h"
 #include "Input.h"
 #include "Tower.h"
 #include "Enemy.h"
 #include "Level.h"
 
-class Game {
+#include <iostream>
+#include <vector>
+
+class Game
+{
 public:
     Game();
     ~Game();
@@ -16,6 +21,8 @@ public:
     bool init();
     void loop();
     void cleanup();
+    
+    static double deltaTime();
 
 private:
     Graphics graphics_;

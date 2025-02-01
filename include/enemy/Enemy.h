@@ -1,17 +1,16 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#include "Graphics.h"
+#include "../graphics/Graphics.h"
 
-class Graphics;
-
-class Enemy {
+class Enemy
+{
 public:
     Enemy();
-    virtual ~Enemy();
+    ~Enemy();
 
-    virtual void update();
-    virtual void render(Graphics &graphics);
+    void update();
+    void render();
 
     void setPosition(float x, float y);
     float getX() const;
@@ -35,4 +34,4 @@ protected:
     float m_distanceTravelled;
 };
 
-#endif //ENEMY_H
+#endif // ENEMY_H

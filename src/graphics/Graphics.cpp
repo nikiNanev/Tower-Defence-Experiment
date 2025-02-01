@@ -27,38 +27,23 @@ void Graphics::cleanup() {
     // ...
 }
 
-void Graphics::render(const std::vector<Tower>& towers, const std::vector<Enemy>& enemies) {
+void Graphics::render() {
     // Clear screen
     // ...
 
-    // Render towers
-    for (auto& tower : towers) {
-        // Render tower sprite at tower position
-        // ...
-    }
+    // // Render towers
+    // for (auto& tower : towers) {
+    //     // Render tower sprite at tower position
+    //     // ...
+    // }
 
-    // Render enemies
-    for (auto& enemy : enemies) {
-        // Render enemy sprite at enemy position
-        // ...
-    }
+    // // Render enemies
+    // for (auto& enemy : enemies) {
+    //     // Render enemy sprite at enemy position
+    //     // ...
+    // }
 
     // Update screen
     // ...
 }
 
-void Graphics::drawCircle(int x, int y, int radius, const Color& color)
-{
-    for (int i = x - radius; i <= x + radius; i++)
-    {
-        for (int j = y - radius; j <= y + radius; j++)
-        {
-            int dx = i - x;
-            int dy = j - y;
-            if (dx*dx + dy*dy <= radius*radius)
-            {
-                setPixel(i, j, color);
-            }
-        }
-    }
-}

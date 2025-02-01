@@ -3,10 +3,9 @@
 #include "../include/lib/glm/gtc/matrix_transform.hpp"
 #include "../include/lib/glm/gtc/type_ptr.hpp"
 
-#include "../include/lib/GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 #include <iostream>
 
-#include "../include/ui/window_manager.h"
 #include "../include/map/map.h"
 
 #include "../include/input/processing.h"
@@ -24,19 +23,35 @@ float last_frame = 0.0f;
 const std::string error_text_glfw_window = "Failed to create Window.";
 const std::string error_text_glad_initialize = "Failed to initialize GLAD.";
 
-int main(void) {
-	WindowManager *win_manager = new WindowManager();
+int main(int argc, char *argv[])
+{
 
 	Callbacks *callback = new Callbacks();
 
-	Level *level = new Level("Starting Point One", 1, 1, 1);
-	level->setDifficulty(2);
+	// Level *level = new Level("Starting Point One", 1, 1, 1);
+	// level->setDifficulty(2);
 	// glfw window creation
 	// --------------------
+
+	if (!glfwInit())
+	{
+		// Handle initialization failure
+
+		const char *description;
+		int code = glfwGetError(&description);
+
+		if (description)
+		{
+			std::cout << "Code of glfw error: " << code << std::endl;
+			std::cout << "Description of glfw error: " << description << std::endl;
+		}
+	}
+	GLFWmonitor *primary = glfwGetPrimaryMonitor();
 	GLFWwindow *window = glfwCreateWindow(
-	    win_manager->getWidth(), win_manager->getHeight(),
-	    win_manager->getTitle().c_str(), win_manager->getMonitor(), NULL);
-	if (window == NULL) {
+		1920, 1080, "Tower Defence Experiment v1.0.0", primary, NULL);
+
+	if (window == NULL)
+	{
 		std::cout << error_text_glfw_window << std::endl;
 		glfwTerminate();
 		return -1;
@@ -51,76 +66,77 @@ int main(void) {
 
 	// glad: load all OpenGL function pointers
 	// ---------------------------------------
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
 		std::cout << error_text_glad_initialize << std::endl;
 		return -1;
 	}
 
 	Shader tdeShader("shaders/vertex_shader.glsl",
-			 "shaders/fragment_shader.glsl");
+					 "shaders/fragment_shader.glsl");
 
 	// set up vertex data ( Cube )
 	// ------------------------------------------------------------------
 	float vertices[] = {
-	    // front face
-	    // first triangle       	//Texture coords
-	    0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top right
-	    0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   // bottom right
-	    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom left
-	    // second triangle
-	    0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top right
-	    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom left
-	    -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,   // top left
+		// front face
+		// first triangle       	//Texture coords
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,	// top right
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,	// bottom right
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // bottom left
+		// second triangle
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,	// top right
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // bottom left
+		-0.5f, 0.5f, 0.5f, 0.0f, 1.0f,	// top left
 
-	    // back face
-	    // first triangle		//Texture coords
-	    0.5f, 0.5f, -0.5f, 1.0f, 1.0f,    // top right
-	    0.5f, -0.5f, -0.5f, 1.0f, 0.0f,   // bottom right
-	    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom left
-	    // second triangle
-	    0.5f, 0.5f, -0.5f, 1.0f, 1.0f,    // top right
-	    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom left
-	    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,   // top left
+		// back face
+		// first triangle		//Texture coords
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,	 // top right
+		0.5f, -0.5f, -0.5f, 1.0f, 0.0f,	 // bottom right
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom left
+		// second triangle
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,	 // top right
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom left
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,	 // top left
 
-	    // top face
-	    // first triangle
-	    0.5f, 0.5f, -0.5f, 1.0f, 1.0f,  // top right
-	    0.5f, 0.5f, 0.5f, 1.0f, 0.0f,   // bottom right
-	    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,  // bottom left
-	    // second triangle
-	    0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top right
-	    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,   // bottom left
-	    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // top left
+		// top face
+		// first triangle
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f, // top right
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,  // bottom right
+		-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, // bottom left
+		// second triangle
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,	// top right
+		-0.5f, 0.5f, 0.5f, 0.0f, 0.0f,	// bottom left
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, // top left
 
-	    // bottom face
-	    // first triangle
-	    0.5f, -0.5f, -0.5f, 1.0f, 1.0f,  // top right
-	    0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   // bottom right
-	    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom left
-	    // second triangle
-	    0.5f, -0.5f, -0.5f, 1.0f, 1.0f,   // top right
-	    -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom left
-	    -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // top left
+		// bottom face
+		// first triangle
+		0.5f, -0.5f, -0.5f, 1.0f, 1.0f, // top right
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,	// bottom right
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, // bottom left
+		// second triangle
+		0.5f, -0.5f, -0.5f, 1.0f, 1.0f,	 // top right
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,	 // bottom left
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, // top left
 
-	    // left face
-	    // first triangle
-	    -0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top right
-	    -0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   // bottom right
-	    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom left
-	    // second triangle
-	    -0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top right
-	    -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom left
-	    -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,   // top left
+		// left face
+		// first triangle
+		-0.5f, 0.5f, 0.5f, 1.0f, 1.0f,	 // top right
+		-0.5f, -0.5f, 0.5f, 1.0f, 0.0f,	 // bottom right
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom left
+		// second triangle
+		-0.5f, 0.5f, 0.5f, 1.0f, 1.0f,	 // top right
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom left
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,	 // top left
 
-	    // right face
-	    // first triangle
-	    0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top right
-	    0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   // bottom right
-	    0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom left
-	    // second triangle
-	    0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top right
-	    0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom left
-	    0.5f, 0.5f, -0.5f, 0.0f, 1.0f,   // top left
+		// right face
+		// first triangle
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,	// top right
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,	// bottom right
+		0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom left
+		// second triangle
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,	// top right
+		0.5f, -0.5f, -0.5f, 0.0f, 0.0f, // bottom left
+		0.5f, 0.5f, -0.5f, 0.0f, 1.0f,	// top left
 	};
 
 	GLuint VAO, VBO;
@@ -131,44 +147,48 @@ int main(void) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
-		     GL_STATIC_DRAW);
+				 GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-			      (void *)0);
+						  (void *)0);
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-			      (void *)(3 * sizeof(float)));
+						  (void *)(3 * sizeof(float)));
 
 	InputProcessing *input = new InputProcessing();
 
-	Map *map = new Map();
-	Terrain *terrain = new Terrain(1);
-	map->loadMap(terrain);
+	// Map *map = new Map();
+	// Terrain *terrain = new Terrain(1);
+	// map->loadMap(terrain);
 
 	unsigned int fps = 0;
 	float counter = 0.0f;
 	// render loop
 	// -----------
-	while (!glfwWindowShouldClose(window)) {
+	while (!glfwWindowShouldClose(window))
+	{
 		// per-frame time logic
 		// --------------------
 		float current_frame = glfwGetTime();
 		delta_time = current_frame - last_frame;
 		last_frame = current_frame;
 
-		if ((counter += delta_time) > 1.0f) {
+		if ((counter += delta_time) > 1.0f)
+		{
 			std::cout << "FPS: " << fps << std::endl;
 			counter = 0.0f;
 			fps = 0;
-		} else {
+		}
+		else
+		{
 			fps++;
 		}
 
 		// input
 		// -----
-		input->keyboard_input(window, delta_time, win_manager);
+		input->keyboard_input(window, delta_time);
 
 		// render
 		// ------
@@ -179,17 +199,17 @@ int main(void) {
 
 		// create transformations
 		glm::mat4 view =
-		    glm::mat4(1.0f);  // make sure to initialize matrix to
-				      // identity matrix first
+			glm::mat4(1.0f); // make sure to initialize matrix to
+							 // identity matrix first
 		glm::mat4 projection = glm::mat4(1.0f);
 
 		projection =
-		    glm::perspective(glm::radians(mouse.fov),
-				     (float)win_manager->getWidth() /
-					 (float)win_manager->getHeight(),
-				     0.1f, 150.0f);
+			glm::perspective(glm::radians(mouse.fov),
+							 (800.0f /
+							  600.0f),
+							 0.1f, 150.0f);
 		view =
-		    glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+			glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		// note: currently we set the projection matrix each frame, but
 		// since the projection matrix rarely changes it's often best

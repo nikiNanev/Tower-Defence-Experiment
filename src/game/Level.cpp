@@ -51,6 +51,8 @@ void Level::update()
 
 void Level::render()
 {
+    Graphics graphics;
+
     // Draw each enemy in the level
     for (auto enemy : m_enemies) {
         enemy->render();

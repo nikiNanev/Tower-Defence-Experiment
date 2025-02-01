@@ -1,27 +1,13 @@
-
-
-class Input {
-public:
-    void beginNewFrame();
-    void keyUpEvent(const SDL_Event& event);
-    void keyDownEvent(const SDL_Event& event);
-
-    bool wasKeyPressed(SDL_Scancode key);
-    bool wasKeyReleased(SDL_Scancode key);
-    bool isKeyHeld(SDL_Scancode key);
-
-private:
-    std::unordered_map<SDL_Scancode, bool> m_heldKeys;
-    std::unordered_map<SDL_Scancode, bool> m_pressedKeys;
-    std::unordered_map<SDL_Scancode, bool> m_releasedKeys;
-};
+#ifndef INPUT_H
+#define INPUT_H
 
 #pragma once
 
 #include <unordered_map>
 #include <SDL2/SDL.h>
 
-class Input {
+class Input
+{
 public:
     Input();
     ~Input();
@@ -37,27 +23,29 @@ public:
     int getMouseY();
 
     void beginNewFrame();
-    void keyUpEvent(const SDL_Event& event);
-    void keyDownEvent(const SDL_Event& event);
+    void keyUpEvent(const SDL_Event &event);
+    void keyDownEvent(const SDL_Event &event);
 
     bool wasKeyPressed(SDL_Scancode key);
     bool wasKeyReleased(SDL_Scancode key);
     bool isKeyHeld(SDL_Scancode key);
 
-    void init() {
+    bool init()
+    {
         m_heldKeys = std::unordered_map<SDL_Scancode, bool>();
         m_pressedKeys = std::unordered_map<SDL_Scancode, bool>();
         m_releasedKeys = std::unordered_map<SDL_Scancode, bool>();
+        return true;
     }
 
     bool quitRequested() const { return m_quitRequested; } // added member function
 
 private:
-  std::unordered_map<SDL_Scancode, bool> m_heldKeys;
-  std::unordered_map<SDL_Scancode, bool> m_pressedKeys;
-  std::unordered_map<SDL_Scancode, bool> m_releasedKeys;
+    std::unordered_map<SDL_Scancode, bool> m_heldKeys;
+    std::unordered_map<SDL_Scancode, bool> m_pressedKeys;
+    std::unordered_map<SDL_Scancode, bool> m_releasedKeys;
 
-  bool m_quitRequested = false;
+    bool m_quitRequested = false;
 };
 
 #endif // INPUT_H

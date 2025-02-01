@@ -11,8 +11,6 @@ class Transitions {
 public:
 	Transitions(){};
 	~Transitions(){};
-	
-	void slide(); //To do (Slide effects for game transitions of states)
 
 	//Setters
 	void setID(size_t id);
